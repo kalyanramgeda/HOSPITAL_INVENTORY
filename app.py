@@ -348,7 +348,10 @@ def update_order_status(order_id):
     return jsonify({"message": "Order status updated"})
 
 # Main
-init_db()
-
 if __name__ == '__main__':
+    if not os.path.exists('database.db'):
+        init_db()
+    else:
+        init_db()
+
     app.run(debug=True, threaded=True)
