@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - Hospital Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #1abc9c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .orders-container {
+            padding: 20px;
+        }
+        
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .orders-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .orders-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .orders-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .orders-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .orders-table tr:hover {
+            background-color: #f1f7fd;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .status-pending {
+            background-color: #fff3e0;
+            color: #ff8f00;
+        }
+        
+        .status-approved {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-shipped {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .status-delivered {
+            background-color: #e0f7fa;
+            color: #0097a7;
+        }
+        
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .urgency-high {
+            font-weight: 600;
+            color: var(--danger-color);
+        }
+        
+        .urgency-critical {
+            font-weight: 700;
+            color: white;
+            background-color: var(--danger-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: var(--danger-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 93%;
+            padding: 10px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-group {
+            flex: 1;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="orders-container">
+        <div class="orders-header">
+            <h1 class="orders-title">Medical Supply Orders</h1>
+            <div class="orders-actions">
+                <button class="btn btn-primary" id="newOrderBtn">
+                    <i class="fas fa-plus"></i> New Order
+                </button>
+                <button class="btn btn-success" id="refreshOrdersBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filter Controls -->
+        <div class="filter-controls">
+            <div class="filter-group">
+                <select class="form-control" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select class="form-control" id="urgencyFilter">
+                    <option value="">All Urgency Levels</option>
+                    <option value="low">Low</option>
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <input type="text" class="form-control" id="searchOrders" placeholder="Search orders...">
+            </div>
+        </div>
+        
+        <!-- Orders Table -->
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Supplier</th>
+                    <th>Urgency</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+                <!-- Orders will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- New Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Order</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="orderForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderItem">Medical Item*</label>
+                        <select class="form-control" id="orderItem" required>
+                            <option value="">Select Item</option>
+                            <!-- Items will be loaded here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderQuantity">Quantity*</label>
+                        <input type="number" class="form-control" id="orderQuantity" required min="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="orderSupplier">Supplier*</label>
+                        <input type="text" class="form-control" id="orderSupplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderUrgency">Urgency*</label>
+                        <select class="form-control" id="orderUrgency" required>
+                            <option value="normal">Normal</option>
+                            <option value="low">Low</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="orderNotes">Notes</label>
+                    <textarea class="form-control" id="orderNotes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancelOrderBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Order Status Modal -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Order Status</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="statusForm">
+                <input type="hidden" id="statusOrderId">
+                <div class="form-group">
+                    <label>Item</label>
+                    <input type="text" class="form-control" id="statusItemName" disabled>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="text" class="form-control" id="statusQuantity" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Current Status</label>
+                        <input type="text" class="form-control" id="currentStatus" disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newStatus">Update Status To*</label>
+                    <select class="form-control" id="newStatus" required>
+                        <option value="approved">Approved</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancelStatusBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const ordersTableBody = document.getElementById('ordersTableBody');
+        const newOrderBtn = document.getElementById('newOrderBtn');
+        const refreshOrdersBtn = document.getElementById('refreshOrdersBtn');
+        const orderModal = document.getElementById('orderModal');
+        const statusModal = document.getElementById('statusModal');
+        const orderForm = document.getElementById('orderForm');
+        const statusForm = document.getElementById('statusForm');
+        const orderItemSelect = document.getElementById('orderItem');
+        const closeBtns = document.querySelectorAll('.close-btn');
+        const cancelBtns = document.querySelectorAll('.btn-danger');
+        const statusFilter = document.getElementById('statusFilter');
+        const urgencyFilter = document.getElementById('urgencyFilter');
+        const searchOrders = document.getElementById('searchOrders');
+        
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let allOrders = [];
+        let allItems = [];
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+            loadInventoryItems();
+            
+            // Set up event listeners
+            newOrderBtn.addEventListener('click', () => orderModal.style.display = 'block');
+            refreshOrdersBtn.addEventListener('click', loadOrders);
+            
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    orderModal.style.display = 'none';
+                    statusModal.style.display = 'none';
+                });
+            });
+            
+            cancelBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    orderModal.style.display = 'none';
+                    statusModal.style.display = 'none';
+                });
+            });
+            
+            // Form submissions
+            orderForm.addEventListener('submit', handleOrderSubmit);
+            statusForm.addEventListener('submit', handleStatusUpdate);
+            
+            // Filter events
+            statusFilter.addEventListener('change', filterOrders);
+            urgencyFilter.addEventListener('change', filterOrders);
+            searchOrders.addEventListener('input', filterOrders);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === orderModal) orderModal.style.display = 'none';
+                if (e.target === statusModal) statusModal.style.display = 'none';
+            });
+        });
+        
+        // Load orders from API
+        async function loadOrders() {
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/orders`);
+                allOrders = await response.json();
+                renderOrders(allOrders);
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showAlert('error', 'Failed to load orders. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Load inventory items for dropdown
+        async function loadInventoryItems() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/inventory`);
+                allItems = await response.json();
+                
+                orderItemSelect.innerHTML = '<option value="">Select Item</option>';
+                allItems.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.name} (Current: ${item.current_stock} ${item.unit}, Min: ${item.min_stock})`;
+                    orderItemSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading inventory items:', error);
+            }
+        }
+        
+        // Render orders in the table
+        function renderOrders(orders) {
+            ordersTableBody.innerHTML = '';
+            
+            if (orders.length === 0) {
+                ordersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            No orders found. Create a new order to get started.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            orders.forEach(order => {
+                const statusClass = `status-${order.status}`;
+                const urgencyClass = order.urgency === 'critical' ? 'urgency-critical' : 
+                                      order.urgency === 'high' ? 'urgency-high' : '';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>#${order.id}</td>
+                    <td>${order.item_name} (${order.unit})</td>
+                    <td>${order.quantity}</td>
+                    <td>${order.supplier}</td>
+                    <td class="${urgencyClass}">${order.urgency.toUpperCase()}</td>
+                    <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+                    <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-info btn-sm" onclick="openStatusModal(
+                            ${order.id}, 
+                            '${escapeString(order.item_name)} (${escapeString(order.unit)})', 
+                            ${order.quantity},
+                            '${order.status}'
+                        )">
+                            <i class="fas fa-edit"></i> Update
+                        </button>
+                    </td>
+                `;
+                ordersTableBody.appendChild(row);
+            });
+        }
+        
+        // Handle new order submission
+        async function handleOrderSubmit(e) {
+            e.preventDefault();
+            
+            const orderData = {
+                item_id: parseInt(orderItemSelect.value),
+                quantity: parseInt(document.getElementById('orderQuantity').value),
+                supplier: document.getElementById('orderSupplier').value,
+                urgency: document.getElementById('orderUrgency').value,
+                notes: document.getElementById('orderNotes').value
+            };
+            
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (response.ok) {
+                    orderModal.style.display = 'none';
+                    orderForm.reset();
+                    await loadOrders();
+                    showAlert('success', 'Order created successfully!');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create order');
+                }
+            } catch (error) {
+                console.error('Error creating order:', error);
+                showAlert('error', error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Open status update modal
+        window.openStatusModal = function(orderId, itemName, quantity, currentStatus) {
+            document.getElementById('statusOrderId').value = orderId;
+            document.getElementById('statusItemName').value = itemName;
+            document.getElementById('statusQuantity').value = quantity;
+            document.getElementById('currentStatus').value = currentStatus;
+            
+            // Set appropriate status options based on current status
+            const statusSelect = document.getElementById('newStatus');
+            statusSelect.innerHTML = '';
+            
+            if (currentStatus === 'pending') {
+                addStatusOption('approved', 'Approve Order');
+                addStatusOption('cancelled', 'Cancel Order');
+            } else if (currentStatus === 'approved') {
+                addStatusOption('shipped', 'Mark as Shipped');
+                addStatusOption('cancelled', 'Cancel Order');
+            } else if (currentStatus === 'shipped') {
+                addStatusOption('delivered', 'Mark as Delivered');
+            }
+            
+            statusModal.style.display = 'block';
+            
+            function addStatusOption(value, text) {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = text;
+                statusSelect.appendChild(option);
+            }
+        };
+        
+        // Handle status update
+        async function handleStatusUpdate(e) {
+            e.preventDefault();
+            
+            const orderId = document.getElementById('statusOrderId').value;
+            const newStatus = document.getElementById('newStatus').value;
+            
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                });
+                
+                if (response.ok) {
+                    statusModal.style.display = 'none';
+                    await loadOrders();
+                    showAlert('success', 'Order status updated successfully!');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to update order status');
+                }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                showAlert('error', error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Filter orders based on selections
+        function filterOrders() {
+            const status = statusFilter.value;
+            const urgency = urgencyFilter.value;
+            const searchTerm = searchOrders.value.toLowerCase();
+            
+            const filtered = allOrders.filter(order => {
+                const matchesStatus = status === '' || order.status === status;
+                const matchesUrgency = urgency === '' || order.urgency === urgency;
+                const matchesSearch = searchTerm === '' || 
+                                     order.item_name.toLowerCase().includes(searchTerm) || 
+                                     order.supplier.toLowerCase().includes(searchTerm) ||
+                                     order.id.toString().includes(searchTerm);
+                
+                return matchesStatus && matchesUrgency && matchesSearch;
+            });
+            
+            renderOrders(filtered);
+        }
+        
+        // Helper function to escape strings for HTML
+        function escapeString(str) {
+            return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        
+        // Show loading state
+        function showLoading(isLoading) {
+            if (isLoading) {
+                document.body.style.cursor = 'wait';
+                refreshOrdersBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            } else {
+                document.body.style.cursor = 'default';
+                refreshOrdersBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+            }
+        }
+        
+        // Show alert message
+        function showAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.padding = '10px 20px';
+            alert.style.borderRadius = '4px';
+            alert.style.color = 'white';
+            alert.style.backgroundColor = type === 'success' ? '#2ecc71' : '#e74c3c';
+            alert.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            alert.style.zIndex = '1000';
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => document.body.removeChild(alert), 500);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

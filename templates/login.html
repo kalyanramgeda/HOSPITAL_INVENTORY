@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hospital Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('{{ url_for('static', filename='photos/Ultra Cure Hospital.png') }}') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.4);
+      height: 111vh;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      color: #fff;
+      margin-left: 60px;
+    }
+
+    .form-container h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 5px;
+      color: #fff;
+    }
+
+    .form-container p {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 14px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    input::placeholder {
+      color: #eee;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .options a {
+      color: #aad;
+      text-decoration: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #135ba1;
+    }
+
+    .create-account {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #aad;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .overlay {
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 60px;
+      }
+
+      .form-container {
+        margin-left: 0;
+        width: 90%;
+        padding: 20px;
+      }
+
+      .form-container h1 {
+        font-size: 24px;
+      }
+
+      .form-container p {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="form-container">
+      <h1>HOSPITAL</h1>
+      <p>Smart Inventory Management</p>
+
+      <form method="POST" action="/login">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" name="phone" placeholder="Enter Phone Number" required>
+
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter Your Name" required>
+
+        <div class="options">
+          <a href="#"></a>
+        </div>
+
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

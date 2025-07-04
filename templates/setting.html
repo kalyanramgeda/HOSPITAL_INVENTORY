@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - Hospital Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .settings-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .settings-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .settings-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .settings-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .settings-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .settings-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1 class="settings-title">System Settings</h1>
+            <div class="settings-actions">
+                <button class="btn btn-success" id="saveSettingsBtn">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+            </div>
+        </div>
+        
+        <div class="settings-tabs">
+            <div class="tab active" data-tab="inventory">Inventory</div>
+            <div class="tab" data-tab="orders">Orders</div>
+            <div class="tab" data-tab="notifications">Notifications</div>
+            <div class="tab" data-tab="system">System</div>
+        </div>
+        
+        <form id="settingsForm">
+            <!-- Inventory Settings -->
+            <div class="tab-content active" id="inventory-tab">
+                <div class="settings-card">
+                    <h3 class="card-title">Inventory Settings</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lowStockThreshold">Low Stock Threshold (%)</label>
+                            <input type="number" class="form-control" id="lowStockThreshold" min="0" max="100" step="0.01">
+                            <div class="help-text">
+                                Percentage of minimum stock level that triggers a low stock warning (e.g., 20% means when stock reaches 1.2x minimum)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="criticalStockThreshold">Critical Stock Threshold (%)</label>
+                            <input type="number" class="form-control" id="criticalStockThreshold" min="0" max="100" step="0.01">
+                            <div class="help-text">
+                                Percentage of minimum stock level that triggers a critical warning (e.g., 10% means when stock reaches 1.1x minimum)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="autoReorderEnabled">
+                        <label for="autoReorderEnabled">Enable Automatic Reordering</label>
+                    </div>
+                    
+                    <div class="form-group" id="autoReorderThresholdGroup">
+                        <label for="autoReorderThreshold">Auto-Reorder Threshold (%)</label>
+                        <input type="number" class="form-control" id="autoReorderThreshold" min="0" max="100" step="0.01">
+                        <div class="help-text">
+                            When stock falls below this percentage of minimum stock, system will automatically create orders
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Settings -->
+            <div class="tab-content" id="orders-tab">
+                <div class="settings-card">
+                    <h3 class="card-title">Order Settings</h3>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="orderApprovalRequired">
+                        <label for="orderApprovalRequired">Require Approval for Orders</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="defaultOrderUrgency">Default Order Urgency</label>
+                        <select class="form-control" id="defaultOrderUrgency">
+                            <option value="low">Low</option>
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="defaultSupplier">Default Supplier</label>
+                        <input type="text" class="form-control" id="defaultSupplier">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="tab-content" id="notifications-tab">
+                <div class="settings-card">
+                    <h3 class="card-title">Notification Settings</h3>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notificationsEnabled">
+                        <label for="notificationsEnabled">Enable Email Notifications</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notificationEmail">Notification Email Address</label>
+                        <input type="email" class="form-control" id="notificationEmail">
+                        <div class="help-text">
+                            System will send alerts to this email address
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notificationFrequency">Notification Frequency</label>
+                        <select class="form-control" id="notificationFrequency">
+                            <option value="immediate">Immediate</option>
+                            <option value="hourly">Hourly Summary</option>
+                            <option value="daily">Daily Summary</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Settings -->
+            <div class="tab-content" id="system-tab">
+                <div class="settings-card">
+                    <h3 class="card-title">System Settings</h3>
+                    
+                    <div class="form-group">
+                        <label for="dataRetention">Data Retention Period (months)</label>
+                        <input type="number" class="form-control" id="dataRetention" min="1" max="60">
+                        <div class="help-text">
+                            How long to keep historical data before automatic cleanup
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableAuditLog">
+                        <label for="enableAuditLog">Enable Audit Logging</label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableBarcode">
+                        <label for="enableBarcode">Enable Barcode Scanning</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="backupFrequency">Automatic Backup Frequency</label>
+                        <select class="form-control" id="backupFrequency">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save All Settings
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const settingsForm = document.getElementById('settingsForm');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const autoReorderEnabled = document.getElementById('autoReorderEnabled');
+        const autoReorderThresholdGroup = document.getElementById('autoReorderThresholdGroup');
+        const notificationsEnabled = document.getElementById('notificationsEnabled');
+        
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Toggle dependent fields
+            autoReorderEnabled.addEventListener('change', () => {
+                autoReorderThresholdGroup.style.display = autoReorderEnabled.checked ? 'block' : 'none';
+            });
+            
+            notificationsEnabled.addEventListener('change', () => {
+                document.getElementById('notificationEmail').disabled = !notificationsEnabled.checked;
+                document.getElementById('notificationFrequency').disabled = !notificationsEnabled.checked;
+            });
+            
+            // Form submission
+            settingsForm.addEventListener('submit', handleSaveSettings);
+        });
+        
+        // Load settings from API
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/settings`);
+                const settings = await response.json();
+                
+                // Convert array of settings to object
+                const settingsObj = {};
+                settings.forEach(setting => {
+                    settingsObj[setting.key] = setting.value;
+                });
+                
+                // Inventory Settings
+                document.getElementById('lowStockThreshold').value = settingsObj.inventory_low_stock_threshold || '20';
+                document.getElementById('criticalStockThreshold').value = settingsObj.inventory_critical_stock_threshold || '10';
+                autoReorderEnabled.checked = settingsObj.auto_reorder_enabled === 'true';
+                document.getElementById('autoReorderThreshold').value = settingsObj.auto_reorder_threshold || '15';
+                autoReorderThresholdGroup.style.display = autoReorderEnabled.checked ? 'block' : 'none';
+                
+                // Order Settings
+                document.getElementById('orderApprovalRequired').checked = settingsObj.order_approval_required === 'true';
+                document.getElementById('defaultOrderUrgency').value = settingsObj.order_default_urgency || 'normal';
+                document.getElementById('defaultSupplier').value = settingsObj.order_default_supplier || '';
+                
+                // Notification Settings
+                notificationsEnabled.checked = settingsObj.notification_enabled === 'true';
+                document.getElementById('notificationEmail').value = settingsObj.notification_email || '';
+                document.getElementById('notificationEmail').disabled = !notificationsEnabled.checked;
+                document.getElementById('notificationFrequency').value = settingsObj.notification_frequency || 'immediate';
+                document.getElementById('notificationFrequency').disabled = !notificationsEnabled.checked;
+                
+                // System Settings
+                document.getElementById('dataRetention').value = settingsObj.data_retention_months || '12';
+                document.getElementById('enableAuditLog').checked = settingsObj.enable_audit_log === 'true';
+                document.getElementById('enableBarcode').checked = settingsObj.enable_barcode === 'true';
+                document.getElementById('backupFrequency').value = settingsObj.backup_frequency || 'daily';
+                
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                alert('Failed to load settings. Please try again.');
+            }
+        }
+        
+        // Handle settings save
+        async function handleSaveSettings(e) {
+            e.preventDefault();
+            
+            const settingsData = {
+                // Inventory Settings
+                inventory_low_stock_threshold: document.getElementById('lowStockThreshold').value,
+                inventory_critical_stock_threshold: document.getElementById('criticalStockThreshold').value,
+                auto_reorder_enabled: autoReorderEnabled.checked ? 'true' : 'false',
+                auto_reorder_threshold: document.getElementById('autoReorderThreshold').value,
+                
+                // Order Settings
+                order_approval_required: document.getElementById('orderApprovalRequired').checked ? 'true' : 'false',
+                order_default_urgency: document.getElementById('defaultOrderUrgency').value,
+                order_default_supplier: document.getElementById('defaultSupplier').value,
+                
+                // Notification Settings
+                notification_enabled: notificationsEnabled.checked ? 'true' : 'false',
+                notification_email: document.getElementById('notificationEmail').value,
+                notification_frequency: document.getElementById('notificationFrequency').value,
+                
+                // System Settings
+                data_retention_months: document.getElementById('dataRetention').value,
+                enable_audit_log: document.getElementById('enableAuditLog').checked ? 'true' : 'false',
+                enable_barcode: document.getElementById('enableBarcode').checked ? 'true' : 'false',
+                backup_frequency: document.getElementById('backupFrequency').value
+            };
+            
+            try {
+                saveSettingsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                const response = await fetch(`${API_BASE_URL}/settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settingsData)
+                });
+                
+                if (response.ok) {
+                    alert('Settings saved successfully!');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save settings');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert(error.message);
+            } finally {
+                saveSettingsBtn.innerHTML = '<i class="fas fa-save"></i> Save Settings';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Supplies Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .supplies-container {
+            padding: 20px;
+        }
+        
+        .supplies-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .supplies-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .supplies-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .supplies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .supply-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .supply-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .supply-card-header {
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .supply-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .supply-category {
+            font-size: 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .supply-card-body {
+            padding: 15px;
+            padding-bottom: 10px;
+        }
+        
+        .supply-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .supply-label {
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        
+        .supply-value {
+            font-weight: 600;
+        }
+        
+        .stock-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-critical {
+            background-color: #ffebee;
+            color: #e53935;
+        }
+        
+        .status-warning {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        
+        .status-good {
+            background-color: #e8f5e9;
+            color: #43a047;
+        }
+        
+        .supplier-info {
+            font-size: 13px;
+            color: #555;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .supplier-info i {
+            color: var(--primary-color);
+        }
+        
+        .supply-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: var(--danger-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 93%;
+            padding: 10px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-group {
+            flex: 1;
+        }
+        
+        .search-bar {
+            position: relative;
+            flex: 2;
+        }
+        
+        .search-bar input {
+            width: 91%;
+            padding: 10px 15px 10px 35px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .supplies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 90%;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="supplies-container">
+        <div class="supplies-header">
+            <h1 class="supplies-title">Medical Supplies Management</h1>
+            <div class="supplies-actions">
+                <button class="btn btn-primary" id="addSupplyBtn">
+                    <i class="fas fa-plus"></i> Add Supply
+                </button>
+                <button class="btn btn-success" id="refreshSuppliesBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filter Controls -->
+        <div class="filter-controls">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="supplySearch" placeholder="Search supplies...">
+            </div>
+            <div class="filter-group">
+                <select class="form-control" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Disposable">Disposable</option>
+                    <option value="Surgical">Surgical</option>
+                    <option value="Diagnostic">Diagnostic</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select class="form-control" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="critical">Critical</option>
+                    <option value="warning">Warning</option>
+                    <option value="good">Good</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Supplies Grid -->
+        <div class="supplies-grid" id="suppliesGrid">
+            <!-- Supplies will be loaded here dynamically -->
+        </div>
+    </div>
+    
+    <!-- Add/Edit Supply Modal -->
+    <div id="supplyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add New Medical Supply</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="supplyForm">
+                <input type="hidden" id="supplyId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplyName">Supply Name*</label>
+                        <input type="text" class="form-control" id="supplyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplyCategory">Category*</label>
+                        <select class="form-control" id="supplyCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Medicine">Medicine</option>
+                            <option value="Equipment">Medical Equipment</option>
+                            <option value="Disposable">Disposable</option>
+                            <option value="Surgical">Surgical</option>
+                            <option value="Diagnostic">Diagnostic</option>
+                            <option value="PPE">PPE</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="currentStock">Current Stock*</label>
+                        <input type="number" class="form-control" id="currentStock" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="minStock">Minimum Stock*</label>
+                        <input type="number" class="form-control" id="minStock" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit*</label>
+                        <select class="form-control" id="unit" required>
+                            <option value="">Select Unit</option>
+                            <option value="Pieces">Pieces</option>
+                            <option value="Boxes">Boxes</option>
+                            <option value="Bottles">Bottles</option>
+                            <option value="Packs">Packs</option>
+                            <option value="Kits">Kits</option>
+                            <option value="Sets">Sets</option>
+                            <option value="Vials">Vials</option>
+                            <option value="Meters">Meters</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplier">Primary Supplier</label>
+                        <input type="text" class="form-control" id="supplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierContact">Supplier Contact</label>
+                        <input type="text" class="form-control" id="supplierContact">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Supply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Stock Update Modal -->
+    <div id="stockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Stock Level</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <form id="stockForm">
+                <input type="hidden" id="stockItemId">
+                <div class="form-group">
+                    <label>Item</label>
+                    <input type="text" class="form-control" id="stockItemName" disabled>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Current Stock</label>
+                        <input type="text" class="form-control" id="stockCurrent" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum Stock</label>
+                        <input type="text" class="form-control" id="stockMin" disabled>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stockAction">Action*</label>
+                        <select class="form-control" id="stockAction" required>
+                            <option value="">Select Action</option>
+                            <option value="restock">Restock</option>
+                            <option value="use">Use Item</option>
+                            <option value="adjust">Adjustment</option>
+                            <option value="discard">Discard Expired</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockQuantity">Quantity*</label>
+                        <input type="number" class="form-control" id="stockQuantity" required min="1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="stockNotes">Notes</label>
+                    <textarea class="form-control" id="stockNotes" rows="3" placeholder="Enter any relevant notes..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancelStockBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="updateStockBtn">Update Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const suppliesGrid = document.getElementById('suppliesGrid');
+        const addSupplyBtn = document.getElementById('addSupplyBtn');
+        const refreshSuppliesBtn = document.getElementById('refreshSuppliesBtn');
+        const supplyModal = document.getElementById('supplyModal');
+        const stockModal = document.getElementById('stockModal');
+        const supplyForm = document.getElementById('supplyForm');
+        const stockForm = document.getElementById('stockForm');
+        const closeBtns = document.querySelectorAll('.close-btn');
+        const cancelBtns = document.querySelectorAll('.btn-danger');
+        const supplySearch = document.getElementById('supplySearch');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let allSupplies = [];
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMedicalSupplies();
+            
+            // Set up event listeners
+            addSupplyBtn.addEventListener('click', () => openSupplyModal());
+            refreshSuppliesBtn.addEventListener('click', loadMedicalSupplies);
+            
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    supplyModal.style.display = 'none';
+                    stockModal.style.display = 'none';
+                });
+            });
+            
+            cancelBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    supplyModal.style.display = 'none';
+                    stockModal.style.display = 'none';
+                });
+            });
+            
+            // Form submissions
+            document.getElementById('supplyForm').addEventListener('submit', handleSupplySubmit);
+            document.getElementById('stockForm').addEventListener('submit', handleStockUpdate);
+            
+            // Filter events
+            supplySearch.addEventListener('input', filterSupplies);
+            categoryFilter.addEventListener('change', filterSupplies);
+            statusFilter.addEventListener('change', filterSupplies);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === supplyModal) supplyModal.style.display = 'none';
+                if (e.target === stockModal) stockModal.style.display = 'none';
+            });
+        });
+        
+        // Load medical supplies from API
+        async function loadMedicalSupplies() {
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/inventory`);
+                allSupplies = await response.json();
+                renderSupplies(allSupplies);
+            } catch (error) {
+                console.error('Error loading medical supplies:', error);
+                alert('Failed to load medical supplies. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Render supplies in the grid
+        function renderSupplies(supplies) {
+            suppliesGrid.innerHTML = '';
+            
+            if (supplies.length === 0) {
+                suppliesGrid.innerHTML = '<p class="no-results">No medical supplies found. Add some supplies to get started.</p>';
+                return;
+            }
+            
+            supplies.forEach(supply => {
+                const status = getStockStatus(supply.current_stock, supply.min_stock);
+                const statusClass = status === 'critical' ? 'status-critical' : 
+                                    status === 'warning' ? 'status-warning' : 'status-good';
+                const statusText = status === 'critical' ? 'Critical' : 
+                                  status === 'warning' ? 'Low' : 'Good';
+                
+                const supplyCard = document.createElement('div');
+                supplyCard.className = 'supply-card';
+                supplyCard.innerHTML = `
+                    <div class="supply-card-header">
+                        <h3 class="supply-name">${supply.name}</h3>
+                        <span class="supply-category">${supply.category}</span>
+                    </div>
+                    <div class="supply-card-body">
+                        <div class="supply-info">
+                            <span class="supply-label">Current Stock:</span>
+                            <span class="supply-value">${supply.current_stock} ${supply.unit}</span>
+                        </div>
+                        <div class="supply-info">
+                            <span class="supply-label">Minimum Required:</span>
+                            <span class="supply-value">${supply.min_stock} ${supply.unit}</span>
+                        </div>
+                        <div class="supply-info">
+                            <span class="supply-label">Status:</span>
+                            <span class="stock-status ${statusClass}">${statusText}</span>
+                        </div>
+                        ${supply.supplier ? `
+                        <div class="supplier-info">
+                            <i class="fas fa-truck"></i>
+                            <span>Supplier: ${supply.supplier}</span>
+                        </div>
+                        ` : ''}
+                        <div class="supply-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openStockModal(
+                                ${supply.id}, 
+                                '${escapeString(supply.name)}', 
+                                ${supply.current_stock},
+                                ${supply.min_stock},
+                                '${escapeString(supply.unit)}'
+                            )">
+                                <i class="fas fa-edit"></i> Update
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="editSupply(${supply.id})">
+                                <i class="fas fa-pencil-alt"></i> Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSupply(${supply.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                suppliesGrid.appendChild(supplyCard);
+            });
+        }
+        
+        // Open supply modal for adding/editing
+        function openSupplyModal(supply = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('supplyForm');
+            
+            if (supply) {
+                modalTitle.textContent = 'Edit Medical Supply';
+                document.getElementById('supplyId').value = supply.id;
+                document.getElementById('supplyName').value = supply.name;
+                document.getElementById('supplyCategory').value = supply.category;
+                document.getElementById('currentStock').value = supply.current_stock;
+                document.getElementById('minStock').value = supply.min_stock;
+                document.getElementById('unit').value = supply.unit;
+                document.getElementById('supplier').value = supply.supplier || '';
+                document.getElementById('supplierContact').value = supply.supplier_contact || '';
+                document.getElementById('description').value = supply.description || '';
+            } else {
+                modalTitle.textContent = 'Add New Medical Supply';
+                form.reset();
+                document.getElementById('supplyId').value = '';
+            }
+            
+            supplyModal.style.display = 'block';
+        }
+        
+        // Open stock update modal
+        window.openStockModal = function(itemId, itemName, currentStock, minStock, unit) {
+            document.getElementById('stockItemId').value = itemId;
+            document.getElementById('stockItemName').value = itemName;
+            document.getElementById('stockCurrent').value = `${currentStock} ${unit}`;
+            document.getElementById('stockMin').value = `${minStock} ${unit}`;
+            stockModal.style.display = 'block';
+        };
+        
+        // Handle supply form submission
+        async function handleSupplySubmit(e) {
+            e.preventDefault();
+            
+            const supplyId = document.getElementById('supplyId').value;
+            const isEdit = !!supplyId;
+            
+            const supplyData = {
+                name: document.getElementById('supplyName').value,
+                category: document.getElementById('supplyCategory').value,
+                current_stock: parseInt(document.getElementById('currentStock').value),
+                min_stock: parseInt(document.getElementById('minStock').value),
+                unit: document.getElementById('unit').value,
+                supplier: document.getElementById('supplier').value,
+                supplier_contact: document.getElementById('supplierContact').value,
+                description: document.getElementById('description').value
+            };
+            
+            try {
+                showLoading(true);
+                let response;
+                
+                if (isEdit) {
+                    response = await fetch(`${API_BASE_URL}/inventory/${supplyId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(supplyData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE_URL}/inventory`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(supplyData)
+                    });
+                }
+                
+                if (response.ok) {
+                    supplyModal.style.display = 'none';
+                    await loadMedicalSupplies();
+                    showAlert('success', `Supply ${isEdit ? 'updated' : 'added'} successfully!`);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || `Failed to ${isEdit ? 'update' : 'add'} supply`);
+                }
+            } catch (error) {
+                console.error('Error saving supply:', error);
+                showAlert('error', error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Handle stock update
+        async function handleStockUpdate(e) {
+            e.preventDefault();
+            
+            const itemId = document.getElementById('stockItemId').value;
+            const action = document.getElementById('stockAction').value;
+            const quantity = parseInt(document.getElementById('stockQuantity').value);
+            const notes = document.getElementById('stockNotes').value;
+            
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/inventory/${itemId}/update-stock`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        quantity: quantity,
+                        notes: notes
+                    })
+                });
+                
+                if (response.ok) {
+                    stockModal.style.display = 'none';
+                    stockForm.reset();
+                    await loadMedicalSupplies();
+                    showAlert('success', 'Stock updated successfully!');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to update stock');
+                }
+            } catch (error) {
+                console.error('Error updating stock:', error);
+                showAlert('error', error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Edit supply
+        window.editSupply = async function(supplyId) {
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/inventory/${supplyId}`);
+                if (response.ok) {
+                    const supply = await response.json();
+                    openSupplyModal(supply);
+                } else {
+                    throw new Error('Failed to fetch supply details');
+                }
+            } catch (error) {
+                console.error('Error editing supply:', error);
+                showAlert('error', error.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+        
+        // Delete supply
+        window.deleteSupply = async function(supplyId) {
+            if (!confirm('Are you sure you want to delete this medical supply? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE_URL}/inventory/${supplyId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    await loadMedicalSupplies();
+                    showAlert('success', 'Supply deleted successfully!');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to delete supply');
+                }
+            } catch (error) {
+                console.error('Error deleting supply:', error);
+                showAlert('error', error.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+        
+        // Filter supplies based on search and filters
+        function filterSupplies() {
+            const searchTerm = supplySearch.value.toLowerCase();
+            const category = categoryFilter.value;
+            const status = statusFilter.value;
+            
+            const filtered = allSupplies.filter(supply => {
+                const matchesSearch = supply.name.toLowerCase().includes(searchTerm) || 
+                                    (supply.description && supply.description.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = category === '' || supply.category === category;
+                
+                const currentStatus = getStockStatus(supply.current_stock, supply.min_stock);
+                const matchesStatus = status === '' || currentStatus === status;
+                
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+            
+            renderSupplies(filtered);
+        }
+        
+        // Helper function to determine stock status
+        function getStockStatus(current, min) {
+            if (current === 0) return 'critical';
+            if (current <= min) return 'warning';
+            if (current <= min * 1.5) return 'warning';
+            return 'good';
+        }
+        
+        // Helper function to escape strings for HTML
+        function escapeString(str) {
+            return str.replace(/"/g, '&quot;');
+        }
+        
+        // Show loading state
+        function showLoading(isLoading) {
+            if (isLoading) {
+                document.body.style.cursor = 'wait';
+                refreshSuppliesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            } else {
+                document.body.style.cursor = 'default';
+                refreshSuppliesBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+            }
+        }
+        
+        // Show alert message
+        function showAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.padding = '10px 20px';
+            alert.style.borderRadius = '4px';
+            alert.style.color = 'white';
+            alert.style.backgroundColor = type === 'success' ? '#2ecc71' : '#e74c3c';
+            alert.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            alert.style.zIndex = '1000';
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => document.body.removeChild(alert), 500);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

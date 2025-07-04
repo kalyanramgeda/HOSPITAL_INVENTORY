@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediStock - Smart Hospital Inventory Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --danger: #ea4335;
+            --warning: #fbbc05;
+            --dark: #202124;
+            --light: #f8f9fa;
+            --gray: #dadce0;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--primary), #0d47a1);
+            color: white;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            z-index: 100;
+        }
+        
+        .logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 24px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo i {
+            color: var(--warning);
+        }
+        
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .nav-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.8);
+            transition: var(--transition);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 24px;
+            padding: 8px 16px;
+            width: 350px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .search-bar input {
+            border: none;
+            padding: 8px;
+            width: 100%;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+        
+        .stat-info p {
+            color: #5f6368;
+        }
+        
+        .card-1 .stat-icon { background: rgba(26, 115, 232, 0.1); color: var(--primary); }
+        .card-2 .stat-icon { background: rgba(52, 168, 83, 0.1); color: var(--secondary); }
+        .card-3 .stat-icon { background: rgba(251, 188, 5, 0.1); color: var(--warning); }
+        .card-4 .stat-icon { background: rgba(234, 67, 53, 0.1); color: var(--danger); }
+        
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .card-header h2 {
+            font-size: 1.4rem;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            font-size: 0.9rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        th {
+            color: #5f6368;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status.in-stock {
+            background: rgba(52, 168, 83, 0.1);
+            color: var(--secondary);
+        }
+        
+        .status.low-stock {
+            background: rgba(251, 188, 5, 0.1);
+            color: var(--warning);
+        }
+        
+        .status.out-of-stock {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--danger);
+        }
+        
+        .alert-card {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-radius: 8px;
+            background: #fff8e1;
+            margin-bottom: 16px;
+        }
+        
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffd54f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            color: #5f6368;
+        }
+        
+        .alert-content h4 {
+            margin-bottom: 4px;
+        }
+        
+        .alert-content p {
+            color: #5f6368;
+            font-size: 0.9rem;
+        }
+        
+        .expiring-soon {
+            background: #ffecb3;
+        }
+        
+        .critical {
+            background: #ffcdd2;
+        }
+        
+        .expired {
+            background: #ffebee;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .logo h1 span, .nav-item span {
+                display: none;
+            }
+            
+            .logo {
+                padding: 0 16px 24px;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 16px;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h1><i class="fas fa-clinic-medical"></i> <span>MediStock</span></h1>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('inventory') }}" class="nav-item">
+            <i class="fas fa-pills"></i>
+            <span>Inventory</span>
+            </a>
+
+            <a href="{{ url_for('medical_supplies') }}" class="nav-item">
+            <i class="fas fa-syringe"></i>
+            <span>Medical Supplies</span>
+            </a>
+
+            <a href="{{ url_for('order') }}" class="nav-item">
+            <i class="fas fa-file-medical"></i>
+            <span>Orders</span>
+            </a>
+            <a href="{{ url_for('analytics') }}" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <i class="fas fa-bell"></i>
+                <span>Alerts</span>
+            </a>
+            <a href="{{ url_for('settings') }}" class="nav-item">
+
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search inventory, orders, or reports...">
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="user-avatar">MS</div>
+                <div>
+                    <div class="user-name">Dr. {{ name }}</div>
+
+                    <div class="user-role">Inventory Manager</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="dashboard-stats">
+            <div class="stat-card card-1">
+                <div class="stat-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ total_items }}</h3>
+                    <p>Total Items</p>
+                </div>
+            </div>
+            <div class="stat-card card-2">
+                <div class="stat-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ category_count }}</h3>
+                    <p>Categories</p>
+
+                </div>
+            </div>
+            <div class="stat-card card-3">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ low_stock_count }}</h3>
+                    <p>Low Stock Items</p>
+                </div>
+            </div>
+            
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Inventory Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Inventory Overview</h2>
+                    <a href="{{ url_for('inventory') }}" class="btn"><i class="fas fa-eye"></i> View</a>
+
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Min. Stock</th>
+                                <th>last ordered</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.current_stock }}</td>
+        <td>{{ item.min_stock }}</td>
+        <td>{{ item.last_ordered or 'N/A' }}</td>
+        <td>
+            {% if item.current_stock == 0 %}
+                <span class="status out-of-stock">Out of Stock</span>
+            {% elif item.current_stock < item.min_stock %}
+                <span class="status low-stock">Low Stock</span>
+            {% else %}
+                <span class="status in-stock">In Stock</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+                    </table>
+                </div>
+            </div>
+
+            <!-- Alerts Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Critical Alerts</h2>
+                    
+                </div>
+                <div class="alerts-container">
+    {% for alert in alerts %}
+        <div class="alert-card {% if alert.current_stock == 0 %}critical{% else %}expiring-soon{% endif %}">
+            <div class="alert-icon">
+                <i class="fas {% if alert.current_stock == 0 %}fa-exclamation-circle{% else %}fa-vial{% endif %}"></i>
+            </div>
+            <div class="alert-content">
+                <h4>{{ alert.name }}</h4>
+                {% if alert.current_stock == 0 %}
+                    <p>Out of stock. Please reorder immediately.</p>
+                {% else %}
+                    <p>Only {{ alert.current_stock }} remaining. Minimum required is {{ alert.min_stock }}.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <p style="padding: 10px; color: #888;">No critical alerts right now.</p>
+    {% endfor %}
+</div>
+
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Recent Orders</h2>
+                <a href="{{ url_for('order') }}" class="btn"><i class="fas fa-eye"></i> View</a>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Supplier</th>
+                            <th>Items</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    {% for order in orders %}
+    <tr>
+        <td>ORD-{{ order.id }}</td>
+        <td>{{ order.supplier }}</td>
+        <td>{{ order.quantity }} x {{ order.item_name }}</td>
+        <td>{{ order.order_date }}</td>
+        <td>
+            <span class="status 
+                {% if order.status == 'delivered' %}in-stock
+                {% elif order.status == 'processing' %}low-stock
+                {% elif order.status == 'pending' %}out-of-stock
+                {% else %}in-stock{% endif %}">
+                {{ order.status.capitalize() }}
+            </span>
+        </td>
+        <td>
+            <a class="btn" style="background: #5f6368; padding: 6px 12px; font-size: 0.9rem;">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
