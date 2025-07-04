@@ -62,7 +62,7 @@ def get_db_connection():
 # Routes
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -348,10 +348,7 @@ def update_order_status(order_id):
     return jsonify({"message": "Order status updated"})
 
 # Main
-if __name__ == '__main__':
-    if not os.path.exists('database.db'):
-        init_db()
-    else:
-        init_db()
+init_db()
 
+if __name__ == '__main__':
     app.run(debug=True, threaded=True)
