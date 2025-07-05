@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hospital Login</title>
   <style>
     * {
@@ -137,10 +137,11 @@
 
       <form method="POST" action="/login">
         <label for="phone">Phone Number</label>
-        <input type="text" id="phone" name="phone" placeholder="Enter Phone Number" required>
+        <input type="text" id="phone" name="phone" placeholder="Enter Phone Number"
+               pattern="\d{10}" title="Enter a valid 10-digit phone number" required />
 
         <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter Your Name" required>
+        <input type="text" id="name" name="name" placeholder="Enter Your Name" required />
 
         <div class="options">
           <a href="#"></a>
@@ -150,5 +151,16 @@
       </form>
     </div>
   </div>
+
+  <!-- Optional JS validation -->
+  <script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+      const phone = document.getElementById("phone").value;
+      if (!/^\d{10}$/.test(phone)) {
+        alert("Please enter a valid 10-digit phone number.");
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>

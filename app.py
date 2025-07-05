@@ -66,8 +66,13 @@ def home():
 
 @app.route('/login', methods=['POST'])
 def login():
-    phone = request.form['phone']
-    name = request.form['name']
+    phone = request.form['phone'].strip()
+    name = request.form['name'].strip()
+
+    # Validate phone number
+    if not phone.isdigit() or len(phone) != 10:
+        flash('Invalid phone number. Please enter a 10-digit number.')
+        return redirect(url_for('home'))
 
     conn = get_db_connection()
     c = conn.cursor()
