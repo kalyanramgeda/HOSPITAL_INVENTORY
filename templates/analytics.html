@@ -458,7 +458,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
     <script>
         // API Configuration
-        const API_BASE_URL = 'http://localhost:5000/api';
+        const API_BASE_URL = '/api';
         
         // Chart instances
         let categoryChart, stockStatusChart, movementChart;
@@ -502,7 +502,7 @@
             });
             
             document.getElementById('viewAllTransactions').addEventListener('click', () => {
-                window.location.href = '/transactions';
+                window.location.href = '/analytics';
             });
         });
         

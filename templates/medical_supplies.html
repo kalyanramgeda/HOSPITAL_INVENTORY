@@ -523,7 +523,7 @@
         const statusFilter = document.getElementById('statusFilter');
         
         // API Configuration
-        const API_BASE_URL = 'http://localhost:5000/api';
+        const API_BASE_URL = '/api';
         let allSupplies = [];
         
         // Initialize the page
@@ -752,7 +752,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        action: action,
+                        action: ['adjust', 'discard'].includes(action) ? 'use' : action,
                         quantity: quantity,
                         notes: notes
                     })
@@ -776,22 +776,15 @@
         }
         
         // Edit supply
-        window.editSupply = async function(supplyId) {
-            try {
-                showLoading(true);
-                const response = await fetch(`${API_BASE_URL}/inventory/${supplyId}`);
-                if (response.ok) {
-                    const supply = await response.json();
-                    openSupplyModal(supply);
-                } else {
-                    throw new Error('Failed to fetch supply details');
-                }
-            } catch (error) {
-                console.error('Error editing supply:', error);
-                showAlert('error', error.message);
-            } finally {
-                showLoading(false);
+        window.editSupply = function(supplyId) {
+            const supply = allSupplies.find(item => Number(item.id) === Number(supplyId));
+
+            if (!supply) {
+                showAlert('error', 'Supply details could not be found.');
+                return;
             }
+
+            openSupplyModal(supply);
         };
         
         // Delete supply

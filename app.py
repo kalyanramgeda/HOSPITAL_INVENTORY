@@ -5,12 +5,23 @@ import os
 import datetime
 
 app = Flask(__name__)
-app.secret_key = 'Kalyan_ram_geda'
+
+# AWS/production configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE_PATH = os.path.join(BASE_DIR, 'database.db')
+
+# Set SECRET_KEY as an Elastic Beanstalk environment variable in AWS.
+# The fallback is only for local development.
+app.config['SECRET_KEY'] = os.environ.get(
+    'SECRET_KEY',
+    'change-this-secret-key-before-production'
+)
+
 CORS(app)
 
 # ---------------------- Database Setup ----------------------
 def init_db():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     c = conn.cursor()
 
     # Users table
@@ -76,7 +87,7 @@ def init_db():
     conn.close()
 
 def get_db_connection():
-    conn = sqlite3.connect('database.db', check_same_thread=False)
+    conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -439,11 +450,13 @@ def analytics_transactions():
     conn.close()
     return jsonify([dict(row) for row in rows])
 
+# Initialize the database when the application is imported.
+# This also runs when Gunicorn imports app.py on AWS Elastic Beanstalk.
+init_db()
+
+
 # ---------------------- Main ----------------------
 if __name__ == '__main__':
-    if not os.path.exists('database.db'):
-        init_db()
-    else:
-        init_db()
-
-    app.run(debug=True, threaded=True)
+    # Local development/testing only.
+    # Production traffic on AWS should be served by Gunicorn via the Procfile.
+    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)

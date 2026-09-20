@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hospital Login</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -12,7 +14,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: url('{{ url_for('static', filename='photos/Ultra Cure Hospital.png') }}') no-repeat center center fixed;
+      background: url('{{ url_for("static", filename="photos/Ultra Cure Hospital.png") }}') no-repeat center center fixed;
       background-size: cover;
       font-family: 'Segoe UI', sans-serif;
       height: 100vh;
@@ -128,39 +130,62 @@
       }
     }
   </style>
+
 </head>
+
 <body>
   <div class="overlay">
     <div class="form-container">
       <h1>HOSPITAL</h1>
       <p>Smart Inventory Management</p>
 
-      <form method="POST" action="/login">
-        <label for="phone">Phone Number</label>
-        <input type="text" id="phone" name="phone" placeholder="Enter Phone Number"
-               pattern="\d{10}" title="Enter a valid 10-digit phone number" required />
+```
+  <form method="POST" action="{{ url_for('login') }}">
+    <label for="phone">Phone Number</label>
 
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter Your Name" required />
+    <input
+      type="text"
+      id="phone"
+      name="phone"
+      placeholder="Enter Phone Number"
+      pattern="\d{10}"
+      title="Enter a valid 10-digit phone number"
+      inputmode="numeric"
+      maxlength="10"
+      required
+    />
 
-        <div class="options">
-          <a href="#"></a>
-        </div>
+    <label for="name">Name</label>
 
-        <button type="submit">Login</button>
-      </form>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      placeholder="Enter Your Name"
+      required
+    />
+
+    <div class="options">
+      <a href="#"></a>
     </div>
+
+    <button type="submit">Login</button>
+  </form>
+</div>
+```
+
   </div>
 
-  <!-- Optional JS validation -->
   <script>
     document.querySelector("form").addEventListener("submit", function (e) {
-      const phone = document.getElementById("phone").value;
+      const phone = document.getElementById("phone").value.trim();
+
       if (!/^\d{10}$/.test(phone)) {
         alert("Please enter a valid 10-digit phone number.");
         e.preventDefault();
       }
     });
   </script>
+
 </body>
 </html>
